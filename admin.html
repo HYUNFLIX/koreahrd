@@ -137,6 +137,21 @@
       font-weight: bold;
       position: sticky;
       top: 0;
+      cursor: pointer;
+    }
+    
+    th:hover {
+      background-color: #e0e0e0;
+    }
+    
+    th.active {
+      background-color: #e0e0e0;
+    }
+    
+    th.active:after {
+      content: attr(data-order);
+      margin-left: 5px;
+      font-size: 14px;
     }
     
     tr:hover {
@@ -305,6 +320,33 @@
     .landing-link a:hover {
       text-decoration: underline;
     }
+    
+    .search-container {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .search-container input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    .search-container button {
+      background-color: var(--crimson);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .search-container button:hover {
+      background-color: #800000;
+    }
   </style>
 </head>
 <body>
@@ -337,34 +379,7 @@
         </div>
       </header>
       
-      <div class="top-panel">
-        <h2>회비 납부 관리</h2>
-        <div class="actions">
-          <button id="add-payment-btn" class="btn">회비 납부 등록</button>
-          <button id="excel-download-btn" class="btn btn-secondary">엑셀 다운로드</button>
-        </div>
-      </div>
-      
-      <div class="table-container">
-        <div id="payments-spinner" class="spinner"></div>
-        <table id="payments-table">
-          <thead>
-            <tr>
-              <th>구분</th>
-              <th>기수</th>
-              <th>이름</th>
-              <th>금액</th>
-              <th>납부일</th>
-              <th>비고</th>
-              <th>관리</th>
-            </tr>
-          </thead>
-          <tbody id="payments-list">
-            <!-- 여기에 목록이 동적으로 추가됩니다 -->
-          </tbody>
-        </table>
-      </div>
-      
+      <!-- 1. 납부 현황 요약을 상단으로 이동 -->
       <h2>납부 현황 요약</h2>
       <div class="summary">
         <div class="summary-card">
@@ -387,6 +402,42 @@
           <h3>재학생</h3>
           <p id="student-members">0명</p>
         </div>
+      </div>
+      
+      <div class="top-panel">
+        <h2>회비 납부 관리</h2>
+        <div class="actions">
+          <button id="add-payment-btn" class="btn">회비 납부 등록</button>
+          <button id="excel-download-btn" class="btn btn-secondary">엑셀 다운로드</button>
+        </div>
+      </div>
+      
+      <!-- 4. 이름 검색 추가 -->
+      <div class="search-container">
+        <input type="text" id="search-input" placeholder="이름으로 검색...">
+        <button id="search-btn">검색</button>
+        <button id="reset-search-btn">초기화</button>
+      </div>
+      
+      <div class="table-container">
+        <div id="payments-spinner" class="spinner"></div>
+        <table id="payments-table">
+          <thead>
+            <tr>
+              <!-- 3. 정렬 가능한 헤더 추가 -->
+              <th class="sortable" data-sort="memberType">구분</th>
+              <th class="sortable" data-sort="generation">기수</th>
+              <th class="sortable" data-sort="name">이름</th>
+              <th class="sortable" data-sort="amount">금액</th>
+              <th class="sortable" data-sort="paymentDate">납부일</th>
+              <th>비고</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="payments-list">
+            <!-- 여기에 목록이 동적으로 추가됩니다 -->
+          </tbody>
+        </table>
       </div>
       
       <div class="landing-link">
@@ -472,13 +523,13 @@
     
     // Firebase 구성 - 본인의 Firebase 프로젝트 설정으로 변경 필요
     const firebaseConfig = {
-  apiKey: "AIzaSyD7yKQdpxyd_zMuuGPxeNeq3VL66fd66RE",
-  authDomain: "koreahrd-e93bf.firebaseapp.com",
-  projectId: "koreahrd-e93bf",
-  storageBucket: "koreahrd-e93bf.firebasestorage.app",
-  messagingSenderId: "821852289871",
-  appId: "1:821852289871:web:9d929ee358ecdc04fda33a",
-  measurementId: "G-GC1YMLDZ6L"
+      apiKey: "AIzaSyD7yKQdpxyd_zMuuGPxeNeq3VL66fd66RE",
+      authDomain: "koreahrd-e93bf.firebaseapp.com",
+      projectId: "koreahrd-e93bf",
+      storageBucket: "koreahrd-e93bf.firebasestorage.app",
+      messagingSenderId: "821852289871",
+      appId: "1:821852289871:web:9d929ee358ecdc04fda33a",
+      measurementId: "G-GC1YMLDZ6L"
     };
     
     // Firebase 초기화
@@ -502,6 +553,13 @@
     const modalTitle = document.getElementById('modal-title');
     const paymentForm = document.getElementById('payment-form');
     const closeBtn = document.querySelector('.close');
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const resetSearchBtn = document.getElementById('reset-search-btn');
+    
+    // 전역 변수
+    let allPayments = []; // 모든 결제 내역 저장
+    let currentSort = { field: 'memberType', order: 'asc' }; // 현재 정렬 상태
     
     // 로그인 로직
     loginBtn.addEventListener('click', async () => {
@@ -542,6 +600,9 @@
         
         // 데이터 로드
         loadPayments();
+        
+        // 정렬 헤더 이벤트 설정
+        setupSortableHeaders();
       } else {
         // 사용자가 로그아웃한 경우
         loginSection.style.display = 'block';
@@ -549,6 +610,36 @@
         userEmail.textContent = '';
       }
     });
+    
+    // 테이블 헤더에 정렬 기능 추가
+    function setupSortableHeaders() {
+      const headers = document.querySelectorAll('th.sortable');
+      headers.forEach(header => {
+        header.addEventListener('click', () => {
+          const field = header.dataset.sort;
+          
+          // 현재 정렬 필드와 같으면 방향 전환, 아니면 새로운 필드로 오름차순 정렬
+          if (currentSort.field === field) {
+            currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+          } else {
+            currentSort.field = field;
+            currentSort.order = 'asc';
+          }
+          
+          // 정렬 표시 업데이트
+          headers.forEach(h => {
+            h.classList.remove('active');
+            h.removeAttribute('data-order');
+          });
+          
+          header.classList.add('active');
+          header.setAttribute('data-order', currentSort.order === 'asc' ? '↑' : '↓');
+          
+          // 테이블 재정렬
+          displayPayments(allPayments);
+        });
+      });
+    }
     
     // 납부 등록 모달 열기
     addPaymentBtn.addEventListener('click', () => {
@@ -563,6 +654,22 @@
       paymentModal.style.display = 'block';
     });
     
+    // 1. 회원 구분에 따른 자동 금액 설정
+    document.getElementById('member-type').addEventListener('change', function() {
+      const memberType = this.value;
+      const amountInput = document.getElementById('amount');
+      
+      if (memberType === '평생회원') {
+        amountInput.value = 500000;
+      } else if (memberType === '졸업생') {
+        amountInput.value = 50000;
+      } else if (memberType === '재학생') {
+        amountInput.value = 30000;
+      } else {
+        amountInput.value = '';
+      }
+    });
+    
     // 모달 닫기
     closeBtn.addEventListener('click', () => {
       paymentModal.style.display = 'none';
@@ -575,38 +682,47 @@
       }
     });
     
+    // 4. 이름 검색 기능
+    searchBtn.addEventListener('click', () => {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      if (searchTerm) {
+        const filteredPayments = allPayments.filter(payment => 
+          payment.name.toLowerCase().includes(searchTerm)
+        );
+        displayPayments(filteredPayments);
+      } else {
+        displayPayments(allPayments);
+      }
+    });
+    
+    // 검색 초기화
+    resetSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      displayPayments(allPayments);
+    });
+    
+    // 검색창에서 엔터 키 이벤트
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchBtn.click();
+      }
+    });
+    
     // 엑셀 다운로드
     excelDownloadBtn.addEventListener('click', async () => {
       try {
-        const paymentsQuery = query(collection(db, "payments"));
-        const querySnapshot = await getDocs(paymentsQuery);
-        
-        let payments = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          payments.push({
-            memberType: data.memberType,
-            generation: data.generation,
-            name: data.name,
-            amount: data.amount,
-            paymentDate: data.paymentDate?.toDate?.() 
-              ? formatDate(data.paymentDate.toDate()) 
-              : formatDate(new Date(data.paymentDate)),
-            note: data.note || ''
-          });
-        });
-        
         // CSV 형식으로 변환
         let csvContent = "구분,기수,이름,금액,납부일,비고\n";
         
-        payments.forEach(payment => {
+        allPayments.forEach(payment => {
           csvContent += [
             payment.memberType,
             payment.generation,
             payment.name,
             payment.amount,
-            payment.paymentDate,
-            payment.note
+            formatDate(payment.paymentDate),
+            payment.note || ''
           ].join(",") + "\n";
         });
         
@@ -633,75 +749,85 @@
     // 납부 데이터 로드
     async function loadPayments() {
       paymentsSpinner.style.display = 'block';
-      const paymentsList = document.getElementById('payments-list');
-      paymentsList.innerHTML = '';
       
       try {
-        const paymentsQuery = query(collection(db, "payments"), orderBy("memberType"));
+        const paymentsQuery = query(collection(db, "payments"));
         const querySnapshot = await getDocs(paymentsQuery);
         
-        let payments = [];
+        allPayments = [];
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          payments.push({
+          allPayments.push({
             id: doc.id,
             ...data,
             paymentDate: data.paymentDate?.toDate?.() || new Date(data.paymentDate)
           });
         });
         
-        // 회원 타입별 정렬
-        const typeOrder = { '평생회원': 1, '후원금': 2, '졸업생': 3, '재학생': 4 };
-        payments.sort((a, b) => {
-          if (typeOrder[a.memberType] !== typeOrder[b.memberType]) {
-            return typeOrder[a.memberType] - typeOrder[b.memberType];
-          }
-          
-          if (a.generation !== b.generation) {
-            return a.generation - b.generation;
-          }
-          
-          return a.name.localeCompare(b.name, 'ko');
-        });
-        
-        // 목록에 추가
-        payments.forEach(payment => {
-          const row = document.createElement('tr');
-          
-          row.innerHTML = `
-            <td>${payment.memberType}</td>
-            <td>${payment.generation}기</td>
-            <td>${payment.name}</td>
-            <td>${payment.amount.toLocaleString()}원</td>
-            <td>${formatDate(payment.paymentDate)}</td>
-            <td>${payment.note || '-'}</td>
-            <td class="action-buttons">
-              <button class="edit-btn" data-id="${payment.id}">수정</button>
-              <button class="delete-btn" data-id="${payment.id}">삭제</button>
-            </td>
-          `;
-          
-          paymentsList.appendChild(row);
-        });
-        
-        // 수정 버튼 이벤트 연결
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-          btn.addEventListener('click', () => openEditModal(btn.dataset.id));
-        });
-        
-        // 삭제 버튼 이벤트 연결
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-          btn.addEventListener('click', () => deletePayment(btn.dataset.id));
-        });
+        // 정렬 및 표시
+        displayPayments(allPayments);
         
         // 요약 정보 업데이트
-        updateSummary(payments);
+        updateSummary(allPayments);
       } catch (error) {
         console.error("데이터 로드 에러:", error);
         alert("데이터 로드 중 오류가 발생했습니다.");
       } finally {
         paymentsSpinner.style.display = 'none';
       }
+    }
+    
+    // 데이터 정렬 및 표시
+    function displayPayments(payments) {
+      const paymentsList = document.getElementById('payments-list');
+      paymentsList.innerHTML = '';
+      
+      // 정렬
+      const sortedPayments = [...payments].sort((a, b) => {
+        const field = currentSort.field;
+        const order = currentSort.order === 'asc' ? 1 : -1;
+        
+        // 회원 타입 특별 정렬
+        if (field === 'memberType') {
+          const typeOrder = { '평생회원': 1, '후원금': 2, '졸업생': 3, '재학생': 4 };
+          return (typeOrder[a.memberType] - typeOrder[b.memberType]) * order;
+        }
+        
+        // 일반 필드 정렬
+        if (a[field] < b[field]) return -1 * order;
+        if (a[field] > b[field]) return 1 * order;
+        return 0;
+      });
+      
+      // 목록에 추가
+      sortedPayments.forEach(payment => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+          <td>${payment.memberType}</td>
+          <td>${payment.generation}기</td>
+          <td>${payment.name}</td>
+          <td>${payment.amount.toLocaleString()}원</td>
+          <td>${formatDate(payment.paymentDate)}</td>
+          <td>${payment.note || '-'}</td>
+          <td class="action-buttons">
+            <button class="edit-btn" data-id="${payment.id}">수정</button>
+            <button class="delete-btn" data-id="${payment.id}">삭제</button>
+          </td>
+        `;
+        
+        paymentsList.appendChild(row);
+      });
+      
+      // 수정 버튼 이벤트 연결
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+      });
+      
+      // 삭제 버튼 이벤트 연결
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deletePayment(btn.dataset.id));
+      });
     }
     
     // 요약 정보 업데이트
@@ -735,18 +861,15 @@
     // 납부 정보 수정 모달 열기
     async function openEditModal(id) {
       try {
-        const docRef = doc(db, "payments", id);
-        const docSnap = await getDocs(query(collection(db, "payments"), where("__name__", "==", id)));
+        const payment = allPayments.find(p => p.id === id);
         
-        if (!docSnap.empty) {
-          const payment = { id, ...docSnap.docs[0].data() };
-          
+        if (payment) {
           document.getElementById('payment-id').value = payment.id;
           document.getElementById('member-type').value = payment.memberType;
           document.getElementById('generation').value = payment.generation;
           document.getElementById('name').value = payment.name;
           document.getElementById('amount').value = payment.amount;
-          document.getElementById('payment-date').valueAsDate = payment.paymentDate?.toDate?.() || new Date(payment.paymentDate);
+          document.getElementById('payment-date').valueAsDate = payment.paymentDate;
           document.getElementById('note').value = payment.note || '';
           
           modalTitle.textContent = '회비 납부 수정';
