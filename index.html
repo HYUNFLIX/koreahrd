@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2025년 고려대학교 기업교육 교우회비 안내</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --crimson: #a00000;
@@ -144,72 +145,227 @@
       color: #666;
       font-size: 14px;
     }
+    
+    #loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 18px;
+      color: var(--gray-dark);
+    }
+    
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: var(--crimson);
+      animation: spin 1s ease infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      color: #d32f2f;
+      text-align: center;
+      padding: 20px;
+      background-color: #ffebee;
+      border-radius: 5px;
+      margin: 20px 0;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>2025년 고려대학교 기업교육 교우회비 안내</h1>
-      <p>교우회의 화합과 발전을 위한 소중한 걸음</p>
-    </header>
-    
-    <div class="highlight">
-      <p>★ 교우회비는 교우회 화합과 발전 및 애경사 시 문자안내와 축하기 및 근조기 등을 보내는데 소중하게 사용되고 있습니다.</p>
-      <p>올해는 <strong>평생회비(50만원)</strong>가 신설되어 평생회비 납부도 가능하시며, 축하기 및 근조기 프로세스도 신청시 발송으로 변경되었습니다.</p>
+    <div id="loading">
+      <div class="loading-spinner"></div>
+      <p>데이터를 불러오는 중...</p>
     </div>
     
-    <div class="section">
-      <h2>평생회비 납부자 혜택</h2>
-      <ul class="benefits-list">
-        <li>경조사 지원 혜택 마련</li>
-        <li>한정판 교우회 평생회비 굿즈 제공</li>
-        <li>APP 명예의 전당 등재</li>
-        <li>학교 관련 제휴 추진 후 혜택 제공(의료, 주차, 도서관 등)</li>
-        <li>제휴업체 할인 제공(호텔, 리조트, 교육 서비스 등)</li>
-        <li>교우회 골프대회 등 이벤트 참가 우선권</li>
-        <li>평생회원 인증 골드카드 지급</li>
-        <li>한마음워크샵에 홍보 지원</li>
-        <li>웨이플 레퍼런스 체크 5회 사용권(50만원 상당)</li>
-      </ul>
-      <p class="note">이외에도 다양한 예우 혜택 마련 업데이트 공지 예정</p>
+    <div id="error-message" class="error-message">
+      데이터를 불러오는 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.
     </div>
     
-    <div class="section">
-      <h2>경조지원 신청 안내</h2>
-      <p>경조사 발생 시 아래 링크를 통해 신청해 주세요. (접수 시 발송)</p>
-      <a href="https://forms.gle/QMWqo5L5VCQiVUdL9" class="btn">경조지원 신청하기</a>
-    </div>
-    
-    <div class="section">
-      <h2>2025년 교우회비 납부현황</h2>
-      <p>교우회비는 현재 <strong>545만원</strong>이 납부되었습니다.(2/25, 9시 기준)</p>
-      <p>교우 여러분의 적극적인 참여 부탁드리며, 납부해주신 교우님들께 깊은 감사드립니다.</p>
+    <div id="content" style="display: none;">
+      <header>
+        <h1>2025년 고려대학교 기업교육 교우회비 안내</h1>
+        <p>교우회의 화합과 발전을 위한 소중한 걸음</p>
+      </header>
       
-      <div class="members-list">
-        <h3>평생회원(10명)</h3>
-        <p>23기 최원설 회장, 26기 정영재, 30기 김현 부회장, 39기 김선미 부회장, 41기 노하현 국장, 44기 이인규 국장, 46기 노치두 총무, 46기 임재영 국장, 47기 김지혜 국장, 50기 안수현</p>
-        
-        <h3>후원금</h3>
-        <p>40기 전유진 10만원</p>
-        
-        <h3>졸업생(7명)</h3>
-        <p>09기 김은주, 11기 강현석, 18기 최태준, 39기 남기운, 40기 임상문, 40기 전유진, 48기 김도연</p>
+      <div class="highlight">
+        <p>★ 교우회비는 교우회 화합과 발전 및 애경사 시 문자안내와 축하기 및 근조기 등을 보내는데 소중하게 사용되고 있습니다.</p>
+        <p>올해는 <strong>평생회비(50만원)</strong>가 신설되어 평생회비 납부도 가능하시며, 축하기 및 근조기 프로세스도 신청시 발송으로 변경되었습니다.</p>
       </div>
-    </div>
-    
-    <div class="section">
-      <h2>2025년 교우회비(연회비) 안내</h2>
-      <div class="account-info">
-        <p><strong>계좌:</strong> 카카오뱅크 3333-22-6092769</p>
-        <p><strong>예금주:</strong> 노치두(고려대 기업교육 교우회 총무)</p>
-        <p><strong>연회비:</strong> 졸업생(5만원), 재학생(3만원)</p>
-        <p class="note">※ 송금시 기수+이름 기재 (예 : 46기 노치두)</p>
+      
+      <div class="section">
+        <h2>평생회비 납부자 혜택</h2>
+        <ul class="benefits-list">
+          <li>경조사 지원 혜택 마련</li>
+          <li>한정판 교우회 평생회비 굿즈 제공</li>
+          <li>APP 명예의 전당 등재</li>
+          <li>학교 관련 제휴 추진 후 혜택 제공(의료, 주차, 도서관 등)</li>
+          <li>제휴업체 할인 제공(호텔, 리조트, 교육 서비스 등)</li>
+          <li>교우회 골프대회 등 이벤트 참가 우선권</li>
+          <li>평생회원 인증 골드카드 지급</li>
+          <li>한마음워크샵에 홍보 지원</li>
+          <li>웨이플 레퍼런스 체크 5회 사용권(50만원 상당)</li>
+        </ul>
+        <p class="note">이외에도 다양한 예우 혜택 마련 업데이트 공지 예정</p>
       </div>
+      
+      <div class="section">
+        <h2>경조지원 신청 안내</h2>
+        <p>경조사 발생 시 아래 링크를 통해 신청해 주세요. (접수 시 발송)</p>
+        <a href="https://forms.gle/QMWqo5L5VCQiVUdL9" class="btn">경조지원 신청하기</a>
+      </div>
+      
+      <div class="section">
+        <h2>2025년 교우회비 납부현황</h2>
+        <p>교우회비는 현재 <strong id="total-amount">0</strong>원이 납부되었습니다.(<span id="update-date">-</span> 기준)</p>
+        <p>교우 여러분의 적극적인 참여 부탁드리며, 납부해주신 교우님들께 깊은 감사드립니다.</p>
+        
+        <div class="members-list">
+          <h3>평생회원(<span id="lifetime-count">0</span>명)</h3>
+          <p id="lifetime-members">아직 납부자가 없습니다.</p>
+          
+          <h3>후원금</h3>
+          <p id="donors">아직 후원금 납부자가 없습니다.</p>
+          
+          <h3>졸업생(<span id="graduate-count">0</span>명)</h3>
+          <p id="graduates">아직 납부자가 없습니다.</p>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>2025년 교우회비(연회비) 안내</h2>
+        <div class="account-info">
+          <p><strong>계좌:</strong> 카카오뱅크 3333-22-6092769</p>
+          <p><strong>예금주:</strong> 노치두(고려대 기업교육 교우회 총무)</p>
+          <p><strong>연회비:</strong> 졸업생(5만원), 재학생(3만원)</p>
+          <p class="note">※ 송금시 기수+이름 기재 (예 : 46기 노치두)</p>
+        </div>
+      </div>
+      
+      <footer>
+        <p>고려대학교 기업교육전공 교우회</p>
+      </footer>
     </div>
-    
-    <footer>
-      <p>고려대학교 기업교육전공 교우회</p>
-    </footer>
   </div>
+
+  <!-- Firebase SDK 추가 -->
+  <script type="module">
+    // Firebase SDK 가져오기
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+      getFirestore, 
+      collection, 
+      getDocs, 
+      query, 
+      orderBy 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase 구성 - 본인의 Firebase 프로젝트 설정으로 변경 필요
+  const firebaseConfig = {
+  apiKey: "AIzaSyD7yKQdpxyd_zMuuGPxeNeq3VL66fd66RE",
+  authDomain: "koreahrd-e93bf.firebaseapp.com",
+  projectId: "koreahrd-e93bf",
+  storageBucket: "koreahrd-e93bf.firebasestorage.app",
+  messagingSenderId: "821852289871",
+  appId: "1:821852289871:web:9d929ee358ecdc04fda33a",
+  measurementId: "G-GC1YMLDZ6L"
+    };
+
+    // Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // DOM 요소
+    const loadingEl = document.getElementById('loading');
+    const contentEl = document.getElementById('content');
+    const errorEl = document.getElementById('error-message');
+    const totalAmountEl = document.getElementById('total-amount');
+    const updateDateEl = document.getElementById('update-date');
+    const lifetimeCountEl = document.getElementById('lifetime-count');
+    const lifetimeMembersEl = document.getElementById('lifetime-members');
+    const donorsEl = document.getElementById('donors');
+    const graduateCountEl = document.getElementById('graduate-count');
+    const graduatesEl = document.getElementById('graduates');
+
+    // 페이지 로드 시 실행
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Firestore에서 결제 데이터 가져오기
+        const paymentsQuery = query(collection(db, "payments"), orderBy("generation"));
+        const querySnapshot = await getDocs(paymentsQuery);
+        
+        let payments = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          payments.push({
+            id: doc.id,
+            ...data,
+            paymentDate: data.paymentDate?.toDate?.() || new Date(data.paymentDate)
+          });
+        });
+        
+        // 데이터로 페이지 업데이트
+        updatePageContent(payments);
+        
+        // 로딩 화면 숨기고 콘텐츠 표시
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+      } catch (error) {
+        console.error("데이터 로드 에러:", error);
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // 페이지 콘텐츠 업데이트 함수
+    function updatePageContent(payments) {
+      // 1. 현재 날짜 표시
+      const now = new Date();
+      const dateString = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      updateDateEl.textContent = dateString;
+      
+      // 2. 총 납부액 계산
+      const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
+      totalAmountEl.textContent = totalAmount.toLocaleString();
+      
+      // 3. 회원 구분별 데이터 정리
+      const lifetimeMembers = payments.filter(p => p.memberType === '평생회원')
+        .sort((a, b) => a.generation - b.generation);
+        
+      const donors = payments.filter(p => p.memberType === '후원금')
+        .sort((a, b) => a.generation - b.generation);
+        
+      const graduates = payments.filter(p => p.memberType === '졸업생' || p.memberType === '재학생')
+        .sort((a, b) => a.generation - b.generation);
+      
+      // 4. 평생회원 정보 업데이트
+      lifetimeCountEl.textContent = lifetimeMembers.length;
+      if (lifetimeMembers.length > 0) {
+        const lifetimeMembersStr = lifetimeMembers.map(p => `${p.generation}기 ${p.name}`).join(', ');
+        lifetimeMembersEl.textContent = lifetimeMembersStr;
+      }
+      
+      // 5. 후원금 정보 업데이트
+      if (donors.length > 0) {
+        const donorsStr = donors.map(p => `${p.generation}기 ${p.name} ${p.amount.toLocaleString()}원`).join(', ');
+        donorsEl.textContent = donorsStr;
+      }
+      
+      // 6. 졸업생 정보 업데이트
+      graduateCountEl.textContent = graduates.length;
+      if (graduates.length > 0) {
+        const graduatesStr = graduates.map(p => `${p.generation}기 ${p.name}`).join(', ');
+        graduatesEl.textContent = graduatesStr;
+      }
+    }
+  </script>
 </body>
 </html>
