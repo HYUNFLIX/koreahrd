@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>고려대학교 기업교육 교우회비 관리 시스템</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --crimson: #a00000;
+      --gold: #e8b923;
+      --gray-light: #f5f5f5;
+      --gray-dark: #333;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    
+    body {
+      color: #333;
+      line-height: 1.6;
+      background-color: var(--gray-light);
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 5px;
+    }
+    
+    header {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 3px solid var(--crimson);
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      color: var(--crimson);
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    h2 {
+      color: var(--crimson);
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 10px;
+      margin: 30px 0 15px;
+      font-size: 22px;
+    }
+    
+    .admin-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .admin-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .form-section {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    button {
+      background-color: var(--crimson);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    
+    button:hover {
+      background-color: #800000;
+    }
+    
+    .dashboard {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .summary-card {
+      background-color: var(--gray-light);
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    
+    .summary-card h3 {
+      margin-bottom: 10px;
+      color: var(--crimson);
+    }
+    
+    .summary-card p {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background-color: var(--gray-light);
+      font-weight: bold;
+    }
+    
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .edit-btn, .delete-btn {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    .edit-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    .delete-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    /* 로그인 섹션 */
+    .login-section {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .app-container {
+      display: none;
+    }
+    
+    /* 모달 */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 5px;
+      max-width: 500px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover {
+      color: black;
+    }
+    
+    /* 스피너 */
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: var(--crimson);
+      animation: spin 1s ease infinite;
+      margin: 20px auto;
+      display: none;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .user-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+    }
+    
+    .user-email {
+      font-weight: bold;
+    }
+    
+    .logout-btn {
+      background-color: #f5f5f5;
+      color: #333;
+      border: 1px solid #ddd;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 로그인 섹션 -->
+  <div id="login-section" class="login-section">
+    <h1>교우회비 관리 시스템</h1>
+    <p>로그인이 필요합니다</p>
+    <div class="form-group">
+      <label for="email">이메일</label>
+      <input type="email" id="email" placeholder="이메일을 입력하세요">
+    </div>
+    <div class="form-group">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" placeholder="비밀번호를 입력하세요">
+    </div>
+    <button id="login-btn">로그인</button>
+    <div id="login-spinner" class="spinner"></div>
+    <p id="login-error" style="color: red; margin-top: 10px;"></p>
+  </div>
+  
+  <!-- 앱 컨테이너 -->
+  <div id="app-container" class="app-container">
+    <div class="container">
+      <header>
+        <h1>고려대학교 기업교육 교우회비 관리 시스템</h1>
+        <p>회비 납부 현황을 관리하고 랜딩 페이지 업데이트</p>
+        <div class="user-info">
+          <span class="user-email" id="user-email"></span>
+          <button class="logout-btn" id="logout-btn">로그아웃</button>
+        </div>
+      </header>
+      
+      <div class="admin-panel">
+        <div class="form-section">
+          <h2>회비 납부 등록</h2>
+          <form id="payment-form">
+            <div class="form-group">
+              <label for="member-type">회원 구분</label>
+              <select id="member-type" required>
+                <option value="">회원 구분 선택</option>
+                <option value="평생회원">평생회원</option>
+                <option value="후원금">후원금</option>
+                <option value="졸업생">졸업생</option>
+                <option value="재학생">재학생</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="generation">기수</label>
+              <input type="number" id="generation" placeholder="예: 46" min="1" max="100" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="name">이름</label>
+              <input type="text" id="name" placeholder="예: 홍길동" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="amount">납부 금액</label>
+              <input type="number" id="amount" placeholder="예: 50000" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="payment-date">납부일</label>
+              <input type="date" id="payment-date" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="note">비고</label>
+              <textarea id="note" rows="2"></textarea>
+            </div>
+            
+            <button type="submit" id="submit-btn">등록하기</button>
+            <div id="submit-spinner" class="spinner"></div>
+          </form>
+        </div>
+        
+        <div class="dashboard">
+          <h2>납부 현황 요약</h2>
+          <div class="summary">
+            <div class="summary-card">
+              <h3>총 납부액</h3>
+              <p id="total-amount">0원</p>
+            </div>
+            <div class="summary-card">
+              <h3>납부 인원</h3>
+              <p id="total-members">0명</p>
+            </div>
+            <div class="summary-card">
+              <h3>평생회원</h3>
+              <p id="lifetime-members">0명</p>
+            </div>
+          </div>
+          
+          <h2>회비 납부 목록</h2>
+          <div id="payments-spinner" class="spinner"></div>
+          <table id="payments-table">
+            <thead>
+              <tr>
+                <th>구분</th>
+                <th>기수/이름</th>
+                <th>금액</th>
+                <th>납부일</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="payments-list">
+              <!-- 여기에 목록이 동적으로 추가됩니다 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="form-section">
+        <h2>관리자 링크</h2>
+        <p>아래 링크로 랜딩 페이지에 접속하여 최신 정보를 확인할 수 있습니다.</p>
+        <a href="index.html" target="_blank" class="btn" style="display: inline-block; margin-top: 10px;">랜딩 페이지 보기</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 수정 모달 -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>납부 정보 수정</h2>
+      <form id="edit-form">
+        <input type="hidden" id="edit-id">
+        <div class="form-group">
+          <label for="edit-member-type">회원 구분</label>
+          <select id="edit-member-type" required>
+            <option value="평생회원">평생회원</option>
+            <option value="후원금">후원금</option>
+            <option value="졸업생">졸업생</option>
+            <option value="재학생">재학생</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-generation">기수</label>
+          <input type="number" id="edit-generation" min="1" max="100" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-name">이름</label>
+          <input type="text" id="edit-name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-amount">납부 금액</label>
+          <input type="number" id="edit-amount" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-payment-date">납부일</label>
+          <input type="date" id="edit-payment-date" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-note">비고</label>
+          <textarea id="edit-note" rows="2"></textarea>
+        </div>
+        
+        <button type="submit" id="edit-submit-btn">저장하기</button>
+        <div id="edit-spinner" class="spinner"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDK 추가 -->
+  <script type="module">
+    // Firebase SDK 가져오기
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      getDocs, 
+      doc, 
+      updateDoc, 
+      deleteDoc, 
+      query, 
+      orderBy, 
+      Timestamp,
+      where
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
+    // Firebase 구성 - 본인의 Firebase 프로젝트 설정으로 변경 필요
+    const firebaseConfig = {
+  apiKey: "AIzaSyD7yKQdpxyd_zMuuGPxeNeq3VL66fd66RE",
+  authDomain: "koreahrd-e93bf.firebaseapp.com",
+  projectId: "koreahrd-e93bf",
+  storageBucket: "koreahrd-e93bf.firebasestorage.app",
+  messagingSenderId: "821852289871",
+  appId: "1:821852289871:web:9d929ee358ecdc04fda33a",
+  measurementId: "G-GC1YMLDZ6L"
+    };
+    
+    // Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // DOM 요소
+    const loginSection = document.getElementById('login-section');
+    const appContainer = document.getElementById('app-container');
+    const loginBtn = document.getElementById('login-btn');
+    const loginSpinner = document.getElementById('login-spinner');
+    const loginError = document.getElementById('login-error');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userEmail = document.getElementById('user-email');
+    const paymentsSpinner = document.getElementById('payments-spinner');
+    const submitSpinner = document.getElementById('submit-spinner');
+    const editSpinner = document.getElementById('edit-spinner');
+    
+    // 로그인 로직
+    loginBtn.addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      loginSpinner.style.display = 'block';
+      loginError.textContent = '';
+      
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // 로그인 성공 시 자동으로 onAuthStateChanged에서 처리됨
+      } catch (error) {
+        console.error("로그인 에러:", error);
+        loginError.textContent = '로그인 실패: ' + error.message;
+        loginSpinner.style.display = 'none';
+      }
+    });
+    
+    // 로그아웃 로직
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        // 로그아웃 성공 시 자동으로 onAuthStateChanged에서 처리됨
+      } catch (error) {
+        console.error("로그아웃 에러:", error);
+      }
+    });
+    
+    // 인증 상태 변경 감지
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // 사용자가 로그인한 경우
+        loginSection.style.display = 'none';
+        appContainer.style.display = 'block';
+        userEmail.textContent = user.email;
+        loginSpinner.style.display = 'none';
+        
+        // 데이터 로드
+        loadPayments();
+      } else {
+        // 사용자가 로그아웃한 경우
+        loginSection.style.display = 'block';
+        appContainer.style.display = 'none';
+        userEmail.textContent = '';
+      }
+    });
+    
+    // 납부 데이터 로드
+    async function loadPayments() {
+      paymentsSpinner.style.display = 'block';
+      const paymentsList = document.getElementById('payments-list');
+      paymentsList.innerHTML = '';
+      
+      try {
+        const paymentsQuery = query(collection(db, "payments"), orderBy("memberType"));
+        const querySnapshot = await getDocs(paymentsQuery);
+        
+        let payments = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          payments.push({
+            id: doc.id,
+            ...data,
+            paymentDate: data.paymentDate?.toDate?.() || new Date(data.paymentDate)
+          });
+        });
+        
+        // 회원 타입별 정렬
+        const typeOrder = { '평생회원': 1, '후원금': 2, '졸업생': 3, '재학생': 4 };
+        payments.sort((a, b) => {
+          if (typeOrder[a.memberType] !== typeOrder[b.memberType]) {
+            return typeOrder[a.memberType] - typeOrder[b.memberType];
+          }
+          
+          if (a.generation !== b.generation) {
+            return a.generation - b.generation;
+          }
+          
+          return a.name.localeCompare(b.name, 'ko');
+        });
+        
+        // 목록에 추가
+        payments.forEach(payment => {
+          const row = document.createElement('tr');
+          
+          row.innerHTML = `
+            <td>${payment.memberType}</td>
+            <td>${payment.generation}기 ${payment.name}</td>
+            <td>${payment.amount.toLocaleString()}원</td>
+            <td>${formatDate(payment.paymentDate)}</td>
+            <td class="action-buttons">
+              <button class="edit-btn" onclick="openEditModal('${payment.id}')">수정</button>
+              <button class="delete-btn" onclick="deletePayment('${payment.id}')">삭제</button>
+            </td>
+          `;
+          
+          paymentsList.appendChild(row);
+        });
+        
+        // 요약 정보 업데이트
+        updateSummary(payments);
+      } catch (error) {
+        console.error("데이터 로드 에러:", error);
+        alert("데이터 로드 중 오류가 발생했습니다.");
+      } finally {
+        paymentsSpinner.style.display = 'none';
+      }
+    }
+    
+    // 요약 정보 업데이트
+    function updateSummary(payments) {
+      const totalAmountEl = document.getElementById('total-amount');
+      const totalMembersEl = document.getElementById('total-members');
+      const lifetimeMembersEl = document.getElementById('lifetime-members');
+      
+      // 총 납부액
+      const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
+      totalAmountEl.textContent = `${totalAmount.toLocaleString()}원`;
+      
+      // 납부 인원
+      totalMembersEl.textContent = `${payments.length}명`;
+      
+      // 평생회원 수
+      const lifetimeMembers = payments.filter(p => p.memberType === '평생회원').length;
+      lifetimeMembersEl.textContent = `${lifetimeMembers}명`;
+    }
+    
+    // 회비 납부 등록
+    const paymentForm = document.getElementById('payment-form');
+    paymentForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      submitSpinner.style.display = 'block';
+      
+      const memberType = document.getElementById('member-type').value;
+      const generation = parseInt(document.getElementById('generation').value);
+      const name = document.getElementById('name').value;
+      const amount = parseInt(document.getElementById('amount').value);
+      const paymentDate = new Date(document.getElementById('payment-date').value);
+      const note = document.getElementById('note').value;
+      
+      // 납부 정보 객체
+      const newPayment = {
+        memberType,
+        generation,
+        name,
+        amount,
+        paymentDate: Timestamp.fromDate(paymentDate),
+        note,
+        createdAt: Timestamp.now()
+      };
+      
+      try {
+        // Firestore에 추가
+        await addDoc(collection(db, "payments"), newPayment);
+        
+        // 폼 초기화
+        paymentForm.reset();
+        document.getElementById('payment-date').valueAsDate = new Date();
+        
+        // 목록 새로고침
+        await loadPayments();
+        
+        alert('납부 정보가 등록되었습니다.');
+      } catch (error) {
+        console.error("등록 에러:", error);
+        alert("등록 중 오류가 발생했습니다.");
+      } finally {
+        submitSpinner.style.display = 'none';
+      }
+    });
+    
+    // 납부 정보 수정 모달 열기
+    window.openEditModal = async function(id) {
+      try {
+        const docRef = doc(db, "payments", id);
+        const docSnap = await getDocs(query(collection(db, "payments"), where("__name__", "==", id)));
+        
+        if (!docSnap.empty) {
+          const payment = { id, ...docSnap.docs[0].data() };
+          
+          document.getElementById('edit-id').value = payment.id;
+          document.getElementById('edit-member-type').value = payment.memberType;
+          document.getElementById('edit-generation').value = payment.generation;
+          document.getElementById('edit-name').value = payment.name;
+          document.getElementById('edit-amount').value = payment.amount;
+          document.getElementById('edit-payment-date').valueAsDate = payment.paymentDate?.toDate?.() || new Date(payment.paymentDate);
+          document.getElementById('edit-note').value = payment.note || '';
+          
+          document.getElementById('edit-modal').style.display = 'block';
+        } else {
+          alert("해당 납부 정보를 찾을 수 없습니다.");
+        }
+      } catch (error) {
+        console.error("정보 조회 에러:", error);
+        alert("정보 조회 중 오류가 발생했습니다.");
+      }
+    };
+    
+    // 수정 모달 닫기
+    document.querySelector('.close').addEventListener('click', function() {
+      document.getElementById('edit-modal').style.display = 'none';
+    });
+    
+    // 모달 외부 클릭 시 닫기
+    window.addEventListener('click', function(e) {
+      if (e.target == document.getElementById('edit-modal')) {
+        document.getElementById('edit-modal').style.display = 'none';
+      }
+    });
+    
+    // 납부 정보 수정
+    const editForm = document.getElementById('edit-form');
+    editForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      editSpinner.style.display = 'block';
+      
+      const id = document.getElementById('edit-id').value;
+      const memberType = document.getElementById('edit-member-type').value;
+      const generation = parseInt(document.getElementById('edit-generation').value);
+      const name = document.getElementById('edit-name').value;
+      const amount = parseInt(document.getElementById('edit-amount').value);
+      const paymentDate = new Date(document.getElementById('edit-payment-date').value);
+      const note = document.getElementById('edit-note').value;
+      
+      // 수정 데이터
+      const updatedPayment = {
+        memberType,
+        generation,
+        name,
+        amount,
+        paymentDate: Timestamp.fromDate(paymentDate),
+        note,
+        updatedAt: Timestamp.now()
+      };
+      
+      try {
+        // Firestore 문서 업데이트
+        await updateDoc(doc(db, "payments", id), updatedPayment);
+        
+        // 목록 새로고침
+        await loadPayments();
+        
+        // 모달 닫기
+        document.getElementById('edit-modal').style.display = 'none';
+        
+        alert('납부 정보가 수정되었습니다.');
+      } catch (error) {
+        console.error("수정 에러:", error);
+        alert("수정 중 오류가 발생했습니다.");
+      } finally {
+        editSpinner.style.display = 'none';
+      }
+    });
+    
+    // 납부 정보 삭제
+    window.deletePayment = async function(id) {
+      if (confirm('정말 삭제하시겠습니까?')) {
+        try {
+          // Firestore 문서 삭제
+          await deleteDoc(doc(db, "payments", id));
+          
+          // 목록 새로고침
+          await loadPayments();
+          
+          alert('납부 정보가 삭제되었습니다.');
+        } catch (error) {
+          console.error("삭제 에러:", error);
+          alert("삭제 중 오류가 발생했습니다.");
+        }
+      }
+    };
+    
+    // 날짜 포맷 함수
+    function formatDate(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+    
+    // 현재 날짜를 기본값으로 설정
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('payment-date').valueAsDate = new Date();
+    });
+  </script>
+</body>
+</html>
